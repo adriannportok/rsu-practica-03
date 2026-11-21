@@ -342,14 +342,19 @@ class MantenimientoTest extends TestCase
         $this->assertSame(5, DiaMantenimiento::where('schedule_id', $otro->id)->count());
     }
 
-    public function test_no_elimina_un_horario_con_dias_ya_marcados(): void
+    public function test_elimina_un_horario_aunque_sus_dias_tengan_datos(): void
     {
-        $m = $this->mantenimiento();
-        $h = $this->crearHorario($m);
-        $h->dias()->first()->update(['status' => DiaMantenimiento::NO_REALIZADO]);
+        [$m, $h] = $this->conDiasDeHoy();
+        $dia = $this->dia($h, today()->subDays(7)->toDateString());
+        $this->actualizarDia($m, $h, $dia, ['done' => 1, 'observation' => 'Todo conforme', 'image' => UploadedFile::fake()->image('foto.jpg')])->assertOk();
+        $ruta = public_path(ltrim($dia->fresh()->image_path, '/'));
+        $this->assertFileExists($ruta);
 
-        $this->ajax('delete', route('admin.mantenimientos.horarios.destroy', [$m, $h]))->assertStatus(422);
-        $this->assertDatabaseHas('maintenance_schedules', ['id' => $h->id]);
+        $this->ajax('delete', route('admin.mantenimientos.horarios.destroy', [$m, $h]))->assertOk();
+
+        $this->assertDatabaseMissing('maintenance_schedules', ['id' => $h->id]);
+        $this->assertSame(0, DiaMantenimiento::count());
+        $this->assertFileDoesNotExist($ruta);
     }
 
     public function test_un_horario_no_se_puede_tocar_desde_otro_mantenimiento(): void

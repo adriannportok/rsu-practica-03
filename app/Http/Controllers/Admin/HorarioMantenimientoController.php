@@ -125,12 +125,8 @@ class HorarioMantenimientoController extends Controller
     {
         $horario = $this->deMantenimiento($mantenimiento, $horario);
 
-        if ($n = ServicioMantenimiento::diasConEstado($horario)) {
-            return $this->rechazo("No se puede eliminar: tiene {$n} día(s) ya marcados como realizados o no realizados. Se conservan como historial.", 'admin.mantenimientos.horarios.index');
-        }
-
         $imagenes = ServicioMantenimiento::imagenesDe($horario);
-        $horario->delete();   // sus días generados se eliminan con él
+        $horario->delete();   // sus días generados se eliminan con él, tengan o no datos (la pantalla pide confirmación antes)
         array_map($this->borrarArchivo(...), $imagenes);
 
         return $this->exito('Horario eliminado junto con sus días generados', 'admin.mantenimientos.horarios.index');

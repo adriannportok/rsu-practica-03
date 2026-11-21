@@ -73,9 +73,8 @@
                         `<a class="btn t-boton-icono t-info" href="${Tads.escapar(fila.url_dias)}" data-bs-toggle="tooltip" title="Ver días"><i class="bi bi-eye-fill"></i></a>`,
                         Tads.botonEditar(fila.id),
                         Tads.botonEliminar(
-                            fila.id, `${fila.dia} ${fila.inicio} - ${fila.fin} · ${fila.vehiculo}`,
-                            fila.dias_con_estado ? `No se puede eliminar: ${plural(fila.dias_con_estado, 'día ya marcado', 'días ya marcados')} como realizados o no realizados` : '',
-                            `Se eliminarán también ${plural(fila.dias, 'día generado', 'días generados')}.`,
+                            fila.id, `${fila.dia} ${fila.inicio} - ${fila.fin} · ${fila.vehiculo}`, '',
+                            `Se eliminarán también ${plural(fila.dias, 'día generado', 'días generados')}${fila.dias_con_estado ? `, incluidos ${plural(fila.dias_con_estado, 'día ya marcado', 'días ya marcados')} como realizados o no realizados` : ''}.`,
                         ),
                     ) },
                 ],

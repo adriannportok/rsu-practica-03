@@ -45,6 +45,7 @@ class DatabaseSeeder extends Seeder
             PersonalSeeder::class,
             VacacionSeeder::class,
             GrupoPersonalSeeder::class,
+            MantenimientoDemoSeeder::class,
             CambiosDemoSeeder::class,
             UsuarioOperadorDemoSeeder::class,
         ]);
