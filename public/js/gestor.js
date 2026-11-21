@@ -198,10 +198,11 @@
         `<button type="button" class="btn t-boton-icono ${clase} t-bloqueado" aria-disabled="true" aria-label="${Tads.escapar(motivo)}" data-bs-toggle="tooltip" title="${Tads.escapar(motivo)}"><i class="bi ${icono}"></i></button>`;
 
     /** Si se pasa un motivo, el botón queda bloqueado y el motivo se ve como ayuda. */
-    Tads.botonEliminar = function (id, nombre, motivoBloqueo = '') {
+    Tads.botonEliminar = function (id, nombre, motivoBloqueo = '', aviso = '') {
         if (motivoBloqueo) return Tads.botonBloqueado('bi-trash3-fill', 't-eliminar', motivoBloqueo);
 
-        return `<button type="button" class="btn t-boton-icono t-eliminar" data-eliminar="${id}" data-nombre="${Tads.escapar(nombre ?? '')}" data-bs-toggle="tooltip" title="Eliminar"><i class="bi bi-trash3-fill"></i></button>`;
+        // `aviso` (opcional) se agrega al mensaje de confirmación: por ejemplo, lo que se eliminará junto con el registro.
+        return `<button type="button" class="btn t-boton-icono t-eliminar" data-eliminar="${id}" data-nombre="${Tads.escapar(nombre ?? '')}" data-aviso="${Tads.escapar(aviso)}" data-bs-toggle="tooltip" title="Eliminar"><i class="bi bi-trash3-fill"></i></button>`;
     };
 
     /** Vista previa de una imagen elegida en un <input type="file"> dentro de su caja punteada. */
@@ -712,7 +713,7 @@
                         `<i class="bi ${c.icono ?? 'bi-pencil-square'} me-2"></i>Editar ${c.entidad}`,
                     );
                 } else if (eliminar) {
-                    this.#confirmarEliminacion(eliminar.dataset.eliminar, eliminar.dataset.nombre);
+                    this.#confirmarEliminacion(eliminar.dataset.eliminar, eliminar.dataset.nombre, eliminar.dataset.aviso);
                 }
             });
 
@@ -796,14 +797,15 @@
             else Tads.alertaDeError(estado, json);
         }
 
-        async #confirmarEliminacion(id, nombre) {
+        async #confirmarEliminacion(id, nombre, aviso = '') {
             const c = this.config;
 
             const decision = await Swal.fire({
                 title: `¿Eliminar ${c.entidad}?`,
-                html: nombre
+                html: (nombre
                     ? `Se eliminará <strong>${Tads.escapar(nombre)}</strong>. Esta acción no se puede deshacer.`
-                    : 'Esta acción no se puede deshacer.',
+                    : 'Esta acción no se puede deshacer.')
+                    + (aviso ? `<div class="mt-2 text-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>${Tads.escapar(aviso)}</div>` : ''),
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#dc3545',

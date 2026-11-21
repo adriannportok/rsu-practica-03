@@ -787,7 +787,7 @@ return [
         ['text' => 'Inicio', 'route' => 'admin.inicio', 'icon' => 'bi bi-house-door'],
         ['header' => 'OPERACIÓN'],
         [
-            'text' => 'Gestión de vehículos', 'can' => ['colors.view', 'brands.view', 'brandmodels.view', 'vehicletypes.view', 'vehicles.view'],
+            'text' => 'Gestión de vehículos', 'can' => ['colors.view', 'brands.view', 'brandmodels.view', 'vehicletypes.view', 'vehicles.view', 'maintenances.view'],
             'icon' => 'bi bi-truck',
             'submenu' => [
                 ['text' => 'Colores', 'route' => 'admin.colores.index', 'can' => 'colors.view', 'icon' => 'bi bi-palette'],
@@ -795,6 +795,7 @@ return [
                 ['text' => 'Modelos', 'route' => 'admin.modelos.index', 'can' => 'brandmodels.view', 'icon' => 'bi bi-wrench-adjustable'],
                 ['text' => 'Tipos de vehículo', 'route' => 'admin.tiposvehiculo.index', 'can' => 'vehicletypes.view', 'icon' => 'bi bi-truck-flatbed'],
                 ['text' => 'Vehículos', 'route' => 'admin.vehiculos.index', 'can' => 'vehicles.view', 'icon' => 'bi bi-truck-front'],
+                ['text' => 'Mantenimiento', 'route' => 'admin.mantenimientos.index', 'can' => 'maintenances.view', 'icon' => 'bi bi-wrench-adjustable'],
             ],
         ],
         [
@@ -893,6 +894,7 @@ return [
                 ['type' => 'css', 'asset' => true, 'location' => 'css/tads-permisos.css'],
                 ['type' => 'js', 'asset' => true, 'location' => 'js/gestor.js'],
                 ['type' => 'js', 'asset' => true, 'location' => 'js/tads/vehiculos.js'],
+                ['type' => 'js', 'asset' => true, 'location' => 'js/tads/mantenimiento.js'],
                 ['type' => 'js', 'asset' => true, 'location' => 'js/tads/asistencias.js'],
                 ['type' => 'js', 'asset' => true, 'location' => 'js/tads/marcacion.js'],
                 ['type' => 'js', 'asset' => true, 'location' => 'js/tads/inicio.js'],

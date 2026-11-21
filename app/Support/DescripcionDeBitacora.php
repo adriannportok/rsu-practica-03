@@ -23,7 +23,10 @@ class DescripcionDeBitacora
         'Asistencia' => ['Asistencia', 'attendances'],
         'Contrato' => ['Contrato', 'contracts'],
         'Feriado' => ['Feriado', 'holidays'],
+        'DiaMantenimiento' => ['Día de mantenimiento', 'maintenance_days'],
         'GrupoPersonal' => ['Grupo de personal', 'staffgroups'],
+        'HorarioMantenimiento' => ['Horario de mantenimiento', 'maintenance_schedules'],
+        'Mantenimiento' => ['Mantenimiento', 'maintenances'],
         'Motivo' => ['Motivo de cambio', 'change_reasons'],
         'Personal' => ['Personal', 'users'],
         'Programacion' => ['Programación', 'programmings'],
@@ -46,15 +49,18 @@ class DescripcionDeBitacora
         'zone_id' => 'Zona', 'group_id' => 'Grupo', 'vehicle_id' => 'Vehículo', 'driver_id' => 'Conductor', 'ayudantes' => 'Ayudantes',
         'weekdays' => 'Días de trabajo', 'department' => 'Departamento', 'province' => 'Provincia', 'district' => 'Distrito',
         'average_waste' => 'Residuos promedio',
-        'programming_id' => 'Programación', 'started_at' => 'Inicio', 'ended_at' => 'Fin', 'observation' => 'Observación',
+        'programming_id' => 'Programación', 'weekday' => 'Día de la semana', 'image_path' => 'Imagen', 'maintenance_id' => 'Mantenimiento', 'started_at' => 'Inicio', 'ended_at' => 'Fin', 'observation' => 'Observación',
     ];
 
     /** Campos que resumen un registro al crearlo o eliminarlo (el resto queda en el detalle de cada módulo). */
     private const RESUMEN = [
         'Asistencia' => ['schedule_id', 'time', 'type', 'status', 'late_minutes', 'source', 'notes'],
         'Contrato' => ['type', 'start_date', 'end_date', 'salary', 'is_active'],
+        'DiaMantenimiento' => ['date', 'status', 'observation', 'image_path'],
         'Feriado' => ['date', 'description', 'status'],
         'GrupoPersonal' => ['shift_id', 'zone_id', 'vehicle_id', 'driver_id', 'weekdays', 'status'],
+        'HorarioMantenimiento' => ['vehicle_id', 'type', 'weekday', 'time_start', 'time_end', 'user_id'],
+        'Mantenimiento' => ['start_date', 'end_date'],
         'Motivo' => ['description'],
         'Personal' => ['dni', 'usertype_id', 'email', 'phone', 'status'],
         'Programacion' => ['date', 'shift_id', 'zone_id', 'vehicle_id', 'driver_id', 'status'],

@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\GrupoPersonal;
+use App\Models\HorarioMantenimiento;
 use App\Models\Personal;
 use App\Models\Programacion;
 use App\Models\Vehiculo;
@@ -16,19 +17,24 @@ use Illuminate\Validation\ValidationException;
 class UsoEnProgramacion
 {
     /** "2 grupo(s) y 14 programación(es)" o null si no se usa en ninguno. */
-    public static function frase(int $grupos, int $programaciones): ?string
+    public static function frase(int $grupos, int $programaciones, int $mantenimientos = 0): ?string
     {
-        $partes = array_filter([
+        $partes = array_values(array_filter([
             $grupos ? $grupos.' '.($grupos === 1 ? 'grupo' : 'grupos') : null,
             $programaciones ? $programaciones.' '.($programaciones === 1 ? 'programación' : 'programaciones') : null,
-        ]);
+            $mantenimientos ? $mantenimientos.' '.($mantenimientos === 1 ? 'horario de mantenimiento' : 'horarios de mantenimiento') : null,
+        ]));
 
-        return $partes ? implode(' y ', $partes) : null;
+        return match (count($partes)) {
+            0 => null,
+            1 => $partes[0],
+            default => implode(', ', array_slice($partes, 0, -1)).' y '.end($partes),
+        };
     }
 
     public static function deVehiculo(int $id): ?string
     {
-        return self::frase(GrupoPersonal::where('vehicle_id', $id)->count(), Programacion::where('vehicle_id', $id)->count());
+        return self::frase(GrupoPersonal::where('vehicle_id', $id)->count(), Programacion::where('vehicle_id', $id)->count(), HorarioMantenimiento::where('vehicle_id', $id)->count());
     }
 
     public static function deZona(int $id): ?string
@@ -46,7 +52,7 @@ class UsoEnProgramacion
         $grupos = GrupoPersonal::where('driver_id', $id)
             ->orWhereHas('ayudantes', fn ($q) => $q->where('users.id', $id))->count();
 
-        return self::frase($grupos, Programacion::dePersona($id)->count());
+        return self::frase($grupos, Programacion::dePersona($id)->count(), HorarioMantenimiento::where('user_id', $id)->count());
     }
 
     /** Programaciones que todavía no se cumplieron (programadas desde hoy en adelante). */

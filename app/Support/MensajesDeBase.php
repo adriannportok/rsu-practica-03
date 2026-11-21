@@ -25,6 +25,7 @@ class MensajesDeBase
             'vehiclecolors' => 'Ya existe un color con ese nombre o código: otra persona lo acaba de registrar. Actualice la lista.',
             'vehicletypes' => 'Ya existe un tipo de vehículo con ese nombre: otra persona lo acaba de registrar. Actualice la lista.',
             'brandmodels' => 'Esa marca ya tiene un modelo con ese nombre o código: otra persona lo acaba de registrar.',
+            'maintenances_name' => 'Ya existe un mantenimiento con ese nombre: otra persona lo acaba de registrar. Actualice la lista.',
             'schedules_name' => 'Ya existe un turno con ese nombre: otra persona lo acaba de registrar.',
             'zones_name' => 'Ya existe una zona con ese nombre: otra persona la acaba de registrar.',
             'staffgroups_name' => 'Ya existe un grupo con ese nombre: otra persona lo acaba de registrar.',

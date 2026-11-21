@@ -7,7 +7,10 @@ use App\Http\Controllers\Admin\ColorController;
 use App\Http\Controllers\Admin\ContratoController;
 use App\Http\Controllers\Admin\DashboardProgramacionController;
 use App\Http\Controllers\Admin\FeriadoController;
+use App\Http\Controllers\Admin\DiaMantenimientoController;
 use App\Http\Controllers\Admin\GrupoPersonalController;
+use App\Http\Controllers\Admin\HorarioMantenimientoController;
+use App\Http\Controllers\Admin\MantenimientoController;
 use App\Http\Controllers\Admin\InicioController;
 use App\Http\Controllers\Admin\MarcaController;
 use App\Http\Controllers\Admin\ModeloController;
@@ -49,6 +52,13 @@ Route::middleware([...$protegidas, VerificarPermiso::class])->prefix('admin')->g
     Route::post('vehiculos/{vehiculo}/imagenes', [VehiculoController::class, 'guardarImagenes'])->name('admin.vehiculos.imagenes.guardar');
     Route::get('vehiculos/buscar', [VehiculoController::class, 'buscar'])->name('admin.vehiculos.buscar');
     Route::resource('vehiculos', VehiculoController::class)->names('admin.vehiculos');
+
+    // Mantenimiento de vehículos (Práctica 03): mantenimientos → horarios → días generados.
+    Route::resource('mantenimientos', MantenimientoController::class)->names('admin.mantenimientos')->parameters(['mantenimientos' => 'mantenimiento']);
+    Route::resource('mantenimientos.horarios', HorarioMantenimientoController::class)->names('admin.mantenimientos.horarios')
+        ->parameters(['mantenimientos' => 'mantenimiento', 'horarios' => 'horario']);
+    Route::resource('mantenimientos.horarios.dias', DiaMantenimientoController::class)->only(['index', 'edit', 'update'])->names('admin.mantenimientos.horarios.dias')
+        ->parameters(['mantenimientos' => 'mantenimiento', 'horarios' => 'horario', 'dias' => 'dia']);
 
     // ---- Gestión de personal
     Route::get('tipos-personal/buscar', [TipoPersonalController::class, 'buscar'])->name('admin.tipospersonal.buscar');

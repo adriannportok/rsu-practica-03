@@ -68,6 +68,7 @@ final class CatalogoPermisos
                     ['titulo' => 'Vehículos', 'icono' => 'bi-truck-front-fill', 'permisos' => self::crud('vehicles', 'Vehículos', extras: [
                         self::extra('vehicles.manage-images', 'Gestionar Imágenes de Vehículos'),
                     ])],
+                    ['titulo' => 'Mantenimiento', 'icono' => 'bi-wrench-adjustable', 'permisos' => self::crud('maintenances', 'Mantenimientos')],
                 ],
             ],
             [
@@ -126,7 +127,7 @@ final class CatalogoPermisos
     /** Recurso del nombre de ruta (admin.<recurso>.<acción>) → prefijo de permiso. */
     private const RECURSOS = [
         'usuarios' => 'users', 'colores' => 'colors', 'marcas' => 'brands', 'modelos' => 'brandmodels',
-        'tiposvehiculo' => 'vehicletypes', 'vehiculos' => 'vehicles', 'tipospersonal' => 'employeetypes',
+        'tiposvehiculo' => 'vehicletypes', 'vehiculos' => 'vehicles', 'mantenimientos' => 'maintenances', 'tipospersonal' => 'employeetypes',
         'personal' => 'employees', 'contratos' => 'contracts', 'asistencias' => 'attendances',
         'vacaciones' => 'vacations', 'turnos' => 'shifts', 'zonas' => 'zones', 'feriados' => 'holidays',
         'grupos' => 'employeegroups', 'programaciones' => 'scheduling', 'motivos' => 'reasons',
