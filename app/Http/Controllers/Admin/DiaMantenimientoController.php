@@ -10,10 +10,6 @@ use App\Models\Mantenimiento;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
-/**
- * Días generados por un horario de mantenimiento. Cada día se edita para dejar una observación, subir una imagen
- * y marcar si el mantenimiento se realizó. Los días no se crean ni se eliminan a mano: los gestiona el horario.
- */
 class DiaMantenimientoController extends Controller
 {
     use RespondeAjax;
@@ -66,7 +62,6 @@ class DiaMantenimientoController extends Controller
             throw ValidationException::withMessages(['done' => 'No se puede marcar como realizado un día que todavía no llega.']);
         }
 
-        // Sin marcar: si el día ya pasó, el mantenimiento no se hizo; si es hoy o más adelante, sigue pendiente.
         $estado = $realizado
             ? DiaMantenimiento::REALIZADO
             : ($dia->date->lt(today()) ? DiaMantenimiento::NO_REALIZADO : DiaMantenimiento::PENDIENTE);

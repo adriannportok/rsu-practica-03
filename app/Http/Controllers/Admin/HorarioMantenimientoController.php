@@ -16,10 +16,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
-/**
- * Horarios de un mantenimiento. Al crear un horario se generan los días de su semana dentro del rango del mantenimiento;
- * al eliminarlo desaparecen también esos días. Dos horarios no pueden cruzarse en día y hora para el mismo vehículo.
- */
 class HorarioMantenimientoController extends Controller
 {
     use RespondeAjax;
@@ -54,7 +50,6 @@ class HorarioMantenimientoController extends Controller
         $datos = $this->validado($request, $mantenimiento);
 
         $horario = DB::transaction(function () use ($datos, $mantenimiento) {
-            // Se bloquea el mantenimiento para que dos horarios del mismo vehículo no se registren a la vez.
             $mantenimiento = Mantenimiento::whereKey($mantenimiento->id)->lockForUpdate()->firstOrFail();
             $this->exigirSinCruce($mantenimiento, $datos);
 
@@ -94,7 +89,6 @@ class HorarioMantenimientoController extends Controller
 
             $this->exigirSinCruce($mantenimiento, $datos, $horario->id);
 
-            // Si cambia el día de la semana, los días generados ya no sirven: solo se rehacen si nadie registró nada en ellos.
             $cambiaElDia = (int) $datos['weekday'] !== $horario->weekday;
 
             if ($cambiaElDia) {
@@ -126,13 +120,12 @@ class HorarioMantenimientoController extends Controller
         $horario = $this->deMantenimiento($mantenimiento, $horario);
 
         $imagenes = ServicioMantenimiento::imagenesDe($horario);
-        $horario->delete();   // sus días generados se eliminan con él, tengan o no datos (la pantalla pide confirmación antes)
+        $horario->delete();
         array_map($this->borrarArchivo(...), $imagenes);
 
         return $this->exito('Horario eliminado junto con sus días generados', 'admin.mantenimientos.horarios.index');
     }
 
-    /** El horario debe pertenecer al mantenimiento de la dirección (evita editar el horario de otro cambiando la URL). */
     private function deMantenimiento(Mantenimiento $mantenimiento, string $id): HorarioMantenimiento
     {
         return $mantenimiento->horarios()->findOrFail($id);
@@ -146,7 +139,6 @@ class HorarioMantenimientoController extends Controller
         ]);
     }
 
-    /** Vehículos y personal activos para los combos; el actual se conserva aunque ya esté inactivo. */
     private function opciones(?HorarioMantenimiento $actual = null): array
     {
         return [
@@ -189,11 +181,9 @@ class HorarioMantenimientoController extends Controller
         ]);
 
         $datos['weekday'] = (int) $datos['weekday'];
-        // Se guardan siempre como HH:MM:SS para que las comparaciones de horas den igual en cualquier base de datos.
         $datos['time_start'] = ServicioMantenimiento::hora($datos['time_start']);
         $datos['time_end'] = ServicioMantenimiento::hora($datos['time_end']);
 
-        // Si el día de la semana nunca ocurre dentro del rango, el horario no generaría ningún día.
         if (ServicioMantenimiento::fechasDe($mantenimiento->start_date, $mantenimiento->end_date, $datos['weekday']) === []) {
             $dia = mb_strtolower(HorarioMantenimiento::DIAS[$datos['weekday']]);
 

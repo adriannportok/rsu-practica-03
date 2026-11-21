@@ -1,12 +1,3 @@
-/**
- * Módulo de Mantenimiento de vehículos (Práctica 03)
- *
- *   - mantenimientos: lista de mantenimientos programados (nombre y rango de fechas) con CRUD en ventana emergente
- *   - horariosMantenimiento: horarios de un mantenimiento (vehículo, tipo, día, horas y responsable)
- *   - diasMantenimiento: días generados por un horario; cada uno se edita (observación, imagen y estado)
- *
- * Todo se envía y recibe con AJAX a través de Tads.Gestor, igual que el resto de módulos.
- */
 (function (global) {
     'use strict';
 
@@ -16,8 +7,6 @@
     const plural = (n, singular, pluralTexto) => `${n} ${n === 1 ? singular : pluralTexto}`;
     const colorTipo = { preventivo: 'azul', limpieza: 'verde', reparacion: 'ambar' };
     const colorEstado = { pendiente: 'ambar', realizado: 'verde', no_realizado: 'rojo' };
-
-    /* ------------------------------------------------------------------ mantenimientos */
 
     Tads.Modulos.mantenimientos = {
         init: function (contenedor) {
@@ -49,8 +38,6 @@
         },
     };
 
-    /* ------------------------------------------------------------------ horarios */
-
     Tads.Modulos.horariosMantenimiento = {
         init: function (contenedor) {
             contenedor._gestor = new Tads.Gestor({
@@ -81,8 +68,6 @@
             });
         },
     };
-
-    /* ------------------------------------------------------------------ días */
 
     Tads.Modulos.diasMantenimiento = {
         init: function (contenedor) {

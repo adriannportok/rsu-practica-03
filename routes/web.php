@@ -53,7 +53,6 @@ Route::middleware([...$protegidas, VerificarPermiso::class])->prefix('admin')->g
     Route::get('vehiculos/buscar', [VehiculoController::class, 'buscar'])->name('admin.vehiculos.buscar');
     Route::resource('vehiculos', VehiculoController::class)->names('admin.vehiculos');
 
-    // Mantenimiento de vehículos (Práctica 03): mantenimientos → horarios → días generados.
     Route::resource('mantenimientos', MantenimientoController::class)->names('admin.mantenimientos')->parameters(['mantenimientos' => 'mantenimiento']);
     Route::resource('mantenimientos.horarios', HorarioMantenimientoController::class)->names('admin.mantenimientos.horarios')
         ->parameters(['mantenimientos' => 'mantenimiento', 'horarios' => 'horario']);

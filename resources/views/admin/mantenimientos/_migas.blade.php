@@ -1,4 +1,3 @@
-{{-- Ruta de navegación del módulo: Gestión de vehículos / Mantenimiento / <mantenimiento> / <horario>. --}}
 <nav aria-label="breadcrumb" class="mb-2">
     <ol class="breadcrumb mb-0 small">
         <li class="breadcrumb-item">Gestión de vehículos</li>

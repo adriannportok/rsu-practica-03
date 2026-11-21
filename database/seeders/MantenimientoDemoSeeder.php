@@ -11,13 +11,8 @@ use Illuminate\Database\Seeder;
 
 class MantenimientoDemoSeeder extends Seeder
 {
-    /**
-     * Dos mantenimientos de ejemplo con sus horarios (los días se generan solos) para que la pantalla no aparezca vacía.
-     * Usa los vehículos y el personal que ya crean VehiculoSeeder y PersonalSeeder; lo que falte se omite.
-     */
     public function run(): void
     {
-        // nombre => [inicio, fin, horarios[código de vehículo, tipo, día ISO, hora inicio, hora fin, DNI del responsable]]
         $mantenimientos = [
             'MANT. DICIEMBRE 2026' => ['2026-12-01', '2026-12-31', [
                 ['VEH-001', HorarioMantenimiento::LIMPIEZA, 1, '08:00', '11:00', '12345678'],

@@ -201,7 +201,6 @@
     Tads.botonEliminar = function (id, nombre, motivoBloqueo = '', aviso = '') {
         if (motivoBloqueo) return Tads.botonBloqueado('bi-trash3-fill', 't-eliminar', motivoBloqueo);
 
-        // `aviso` (opcional) se agrega al mensaje de confirmación: por ejemplo, lo que se eliminará junto con el registro.
         return `<button type="button" class="btn t-boton-icono t-eliminar" data-eliminar="${id}" data-nombre="${Tads.escapar(nombre ?? '')}" data-aviso="${Tads.escapar(aviso)}" data-bs-toggle="tooltip" title="Eliminar"><i class="bi bi-trash3-fill"></i></button>`;
     };
 

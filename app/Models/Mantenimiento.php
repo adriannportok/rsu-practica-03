@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
-/** Programación de mantenimiento de vehículos: un nombre y un rango de fechas con sus horarios. */
 class Mantenimiento extends Model
 {
     use Auditable;

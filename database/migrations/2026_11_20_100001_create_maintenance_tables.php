@@ -6,12 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Mantenimiento de vehículos (Práctica 03):
-     *  - maintenances: la programación del mantenimiento (nombre y rango de fechas).
-     *  - maintenance_schedules: cada horario (vehículo, tipo, día de la semana, horas y responsable).
-     *  - maintenance_days: los días concretos que genera cada horario dentro del rango, con su observación, imagen y estado.
-     */
     public function up(): void
     {
         Schema::create('maintenances', function (Blueprint $tabla) {
@@ -28,9 +22,9 @@ return new class extends Migration
             $tabla->id();
             $tabla->foreignId('maintenance_id')->constrained('maintenances')->cascadeOnDelete();
             $tabla->foreignId('vehicle_id')->constrained('vehicles');
-            $tabla->foreignId('user_id')->constrained('users');        // responsable (personal)
-            $tabla->string('type', 12);                                // preventivo | limpieza | reparacion
-            $tabla->unsignedTinyInteger('weekday');                    // 1 = lunes ... 7 = domingo
+            $tabla->foreignId('user_id')->constrained('users');
+            $tabla->string('type', 12);
+            $tabla->unsignedTinyInteger('weekday');
             $tabla->time('time_start');
             $tabla->time('time_end');
             $tabla->timestamps();
@@ -42,7 +36,7 @@ return new class extends Migration
             $tabla->id();
             $tabla->foreignId('schedule_id')->constrained('maintenance_schedules')->cascadeOnDelete();
             $tabla->date('date');
-            $tabla->string('status', 12)->default('pendiente');        // pendiente | realizado | no_realizado
+            $tabla->string('status', 12)->default('pendiente');
             $tabla->string('observation', 500)->nullable();
             $tabla->string('image_path')->nullable();
             $tabla->timestamps();

@@ -20,7 +20,6 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
 use Tests\TestCase;
 
-/** Práctica 03: mantenimiento de vehículos (mantenimientos → horarios → días generados). */
 class MantenimientoTest extends TestCase
 {
     use RefreshDatabase;
@@ -92,8 +91,6 @@ class MantenimientoTest extends TestCase
         return $m->horarios()->latest('id')->first();
     }
 
-    /* ------------------------------ mantenimientos ------------------------------ */
-
     public function test_registra_y_lista_mantenimientos(): void
     {
         $this->ajax('post', route('admin.mantenimientos.store'), ['name' => 'MANT. FEBRERO 2027', 'start_date' => '2027-02-01', 'end_date' => '2027-02-28'])
@@ -108,7 +105,6 @@ class MantenimientoTest extends TestCase
         $this->ajax('post', route('admin.mantenimientos.store'), ['name' => 'Malo', 'start_date' => '2027-02-10', 'end_date' => '2027-02-09'])
             ->assertStatus(422)->assertJsonValidationErrors('end_date');
 
-        // Un solo día es válido: inicio y fin iguales.
         $this->ajax('post', route('admin.mantenimientos.store'), ['name' => 'Un día', 'start_date' => '2027-02-10', 'end_date' => '2027-02-10'])->assertOk();
     }
 
@@ -130,7 +126,6 @@ class MantenimientoTest extends TestCase
                 ->assertStatus(422)->assertJsonValidationErrors('start_date');
         }
 
-        // Fechas contiguas, sin compartir ningún día, sí se permiten.
         $this->ajax('post', route('admin.mantenimientos.store'), ['name' => 'MANT. ENERO 2027', 'start_date' => '2027-01-01', 'end_date' => '2027-01-31'])->assertOk();
     }
 
@@ -158,11 +153,9 @@ class MantenimientoTest extends TestCase
         $h = $this->crearHorario($m);
         $this->assertSame(['2026-12-07', '2026-12-14', '2026-12-21', '2026-12-28'], $this->fechasDe($h));
 
-        // Se acorta: los lunes pendientes que quedan fuera desaparecen.
         $this->ajax('put', route('admin.mantenimientos.update', $m->id), ['name' => $m->name, 'start_date' => '2026-12-01', 'end_date' => '2026-12-15'])->assertOk();
         $this->assertSame(['2026-12-07', '2026-12-14'], $this->fechasDe($h));
 
-        // Se amplía: aparecen los días nuevos y se conservan los anteriores.
         $this->ajax('put', route('admin.mantenimientos.update', $m->id), ['name' => $m->name, 'start_date' => '2026-12-01', 'end_date' => '2027-01-10'])->assertOk();
         $this->assertSame(['2026-12-07', '2026-12-14', '2026-12-21', '2026-12-28', '2027-01-04'], $this->fechasDe($h));
     }
@@ -201,8 +194,6 @@ class MantenimientoTest extends TestCase
         $this->assertDatabaseCount('maintenances', 1);
     }
 
-    /* ------------------------------ horarios ------------------------------ */
-
     public function test_el_horario_genera_los_dias_de_la_semana_dentro_del_rango(): void
     {
         $m = $this->mantenimiento('2026-12-01', '2026-12-31');
@@ -214,7 +205,6 @@ class MantenimientoTest extends TestCase
         $this->assertSame(['2026-12-07', '2026-12-14', '2026-12-21', '2026-12-28'], $this->fechasDe($h));
         $this->assertSame(['pendiente'], $h->dias->pluck('status')->unique()->all());
 
-        // Los extremos del rango cuentan: un martes cae el 01/12 y también el 29/12.
         $martes = $this->crearHorario($m, ['weekday' => 2]);
         $this->assertSame(['2026-12-01', '2026-12-08', '2026-12-15', '2026-12-22', '2026-12-29'], $this->fechasDe($martes));
     }
@@ -258,14 +248,13 @@ class MantenimientoTest extends TestCase
         $this->ajax('post', route('admin.mantenimientos.horarios.store', $m), $this->datosHorario(['user_id' => $this->responsable(false)->id]))
             ->assertStatus(422)->assertJsonValidationErrors('user_id');
 
-        // Un usuario del sistema (sin función de personal) tampoco es un responsable válido.
         $this->ajax('post', route('admin.mantenimientos.horarios.store', $m), $this->datosHorario(['user_id' => User::factory()->create()->id]))
             ->assertStatus(422)->assertJsonValidationErrors('user_id');
     }
 
     public function test_el_dia_de_la_semana_debe_ocurrir_dentro_del_rango(): void
     {
-        $m = $this->mantenimiento('2026-12-01', '2026-12-03');   // martes a jueves
+        $m = $this->mantenimiento('2026-12-01', '2026-12-03');
 
         $this->ajax('post', route('admin.mantenimientos.horarios.store', $m), $this->datosHorario(['weekday' => 1]))
             ->assertStatus(422)->assertJsonValidationErrors('weekday');
@@ -279,16 +268,13 @@ class MantenimientoTest extends TestCase
         $b = $this->vehiculo('Vehículo B');
         $this->crearHorario($m, ['vehicle_id' => $a->id, 'weekday' => 1, 'time_start' => '08:00', 'time_end' => '11:00']);
 
-        // Lunes 10:00 - 11:00 al mismo vehículo: dentro del anterior.
         $this->ajax('post', route('admin.mantenimientos.horarios.store', $m), $this->datosHorario(['vehicle_id' => $a->id, 'weekday' => 1, 'time_start' => '10:00', 'time_end' => '11:00']))
             ->assertStatus(422)->assertJsonValidationErrors('time_start');
-        // Cruces parciales y envolventes.
         foreach ([['07:00', '08:30'], ['10:30', '12:00'], ['06:00', '13:00'], ['08:00', '11:00']] as [$ini, $fin]) {
             $this->ajax('post', route('admin.mantenimientos.horarios.store', $m), $this->datosHorario(['vehicle_id' => $a->id, 'weekday' => 1, 'time_start' => $ini, 'time_end' => $fin]))
                 ->assertStatus(422);
         }
 
-        // Permitidos: otro vehículo a la misma hora, otro día, y horas que solo se tocan.
         $this->ajax('post', route('admin.mantenimientos.horarios.store', $m), $this->datosHorario(['vehicle_id' => $b->id, 'weekday' => 1, 'time_start' => '08:00', 'time_end' => '11:00']))->assertOk();
         $this->ajax('post', route('admin.mantenimientos.horarios.store', $m), $this->datosHorario(['vehicle_id' => $a->id, 'weekday' => 3, 'time_start' => '08:00', 'time_end' => '11:00']))->assertOk();
         $this->ajax('post', route('admin.mantenimientos.horarios.store', $m), $this->datosHorario(['vehicle_id' => $a->id, 'weekday' => 1, 'time_start' => '11:00', 'time_end' => '13:00']))->assertOk();
@@ -324,7 +310,6 @@ class MantenimientoTest extends TestCase
             ->assertStatus(422)->assertJsonValidationErrors('weekday');
         $this->assertSame(3, $h->fresh()->weekday);
 
-        // Cambiar solo las horas o el tipo conserva los días ya registrados.
         $this->ajax('put', route('admin.mantenimientos.horarios.update', [$m, $h]), $this->datosHorario(['vehicle_id' => $a->id, 'weekday' => 3, 'type' => 'limpieza', 'time_end' => '12:00']))->assertOk();
         $this->assertSame('Revisado', $h->dias()->first()->observation);
     }
@@ -381,9 +366,6 @@ class MantenimientoTest extends TestCase
             ->assertJsonPath('data.1.dia', 'Miércoles')->assertJsonPath('data.1.fin', '04:00 pm');
     }
 
-    /* ------------------------------ días ------------------------------ */
-
-    /** Mantenimiento con un horario que cae hoy: sus días son hoy ± 7 y ± 14 días. */
     private function conDiasDeHoy(): array
     {
         $m = $this->mantenimiento(today()->subDays(14)->toDateString(), today()->addDays(14)->toDateString(), 'MANT. ACTUAL');
@@ -460,7 +442,6 @@ class MantenimientoTest extends TestCase
         $this->assertFileDoesNotExist(public_path(ltrim($primera, '/')));
         $this->assertFileExists(public_path(ltrim($segunda, '/')));
 
-        // Guardar sin imagen nueva conserva la actual.
         $this->actualizarDia($m, $h, $dia, ['done' => 1, 'observation' => 'Sigue la foto'])->assertOk();
         $this->assertSame($segunda, $dia->fresh()->image_path);
 
@@ -495,8 +476,6 @@ class MantenimientoTest extends TestCase
         $this->assertFileDoesNotExist($ruta);
     }
 
-    /* ------------------------------ integración con el resto del sistema ------------------------------ */
-
     public function test_no_elimina_un_vehiculo_ni_una_persona_que_figura_en_un_horario(): void
     {
         $m = $this->mantenimiento();
@@ -517,7 +496,7 @@ class MantenimientoTest extends TestCase
         $m = $this->mantenimiento();
         $h = $this->crearHorario($m);
 
-        $this->flushHeaders();   // las pantallas se piden como una página normal, no como AJAX
+        $this->flushHeaders();
         $this->get(route('admin.mantenimientos.index'))->assertOk()->assertSee('Mantenimientos programados')->assertSee('Nuevo mantenimiento')->assertSee('js/tads/mantenimiento.js', false);
         $this->get(route('admin.mantenimientos.horarios.index', $m))->assertOk()->assertSee('MANT. DICIEMBRE 2026 / Horarios')->assertSee('Agregar horario');
         $this->get(route('admin.mantenimientos.horarios.dias.index', [$m, $h]))->assertOk()->assertSee('Días programados');
@@ -537,7 +516,6 @@ class MantenimientoTest extends TestCase
 
         $this->actingAs($operador);
 
-        // Con solo «ver»: lista, pero no crea, edita ni elimina.
         $this->ajax('get', route('admin.mantenimientos.index'))->assertOk();
         $this->ajax('get', route('admin.mantenimientos.horarios.index', $m))->assertOk();
         $this->ajax('post', route('admin.mantenimientos.store'), ['name' => 'X', 'start_date' => '2030-01-01', 'end_date' => '2030-01-02'])->assertForbidden();
@@ -546,12 +524,10 @@ class MantenimientoTest extends TestCase
         $this->ajax('delete', route('admin.mantenimientos.horarios.destroy', [$m, $h]))->assertForbidden();
         $this->ajax('delete', route('admin.mantenimientos.destroy', $m->id))->assertForbidden();
 
-        // Un operador sin ningún permiso del módulo ni siquiera ve la lista.
         $sin = User::factory()->operador()->create();
         $this->actingAs($sin)->ajax('get', route('admin.mantenimientos.index'))->assertForbidden();
     }
 
-    /** @return list<string> */
     private function fechasDe(HorarioMantenimiento $h): array
     {
         return $h->dias()->get()->map(fn (DiaMantenimiento $d) => $d->date->toDateString())->all();

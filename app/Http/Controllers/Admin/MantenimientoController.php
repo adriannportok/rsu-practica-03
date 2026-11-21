@@ -12,10 +12,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
-/**
- * Gestión de vehículos → Mantenimiento (Práctica 03): programaciones de mantenimiento con nombre y rango de fechas.
- * Las fechas de dos mantenimientos nunca se solapan. Los horarios y los días viven en sus propios controladores.
- */
 class MantenimientoController extends Controller
 {
     use RespondeAjax;
@@ -49,7 +45,6 @@ class MantenimientoController extends Controller
         $datos = $this->validado($request);
 
         $mantenimiento = DB::transaction(function () use ($datos) {
-            // Se bloquean los mantenimientos existentes para que dos personas no registren fechas que se pisan a la vez.
             Mantenimiento::lockForUpdate()->pluck('id');
             $this->exigirSinCruce($datos);
 
@@ -88,7 +83,6 @@ class MantenimientoController extends Controller
 
             $mantenimiento->update($datos);
 
-            // Con otras fechas, los horarios ya creados generan los días nuevos y pierden los pendientes que quedaron fuera.
             if ($cambioElRango) {
                 ServicioMantenimiento::sincronizar($mantenimiento->fresh());
             }
@@ -110,7 +104,7 @@ class MantenimientoController extends Controller
         }
 
         $imagenes = ServicioMantenimiento::imagenesDe($mantenimiento);
-        $mantenimiento->delete();   // los horarios y sus días se eliminan con él
+        $mantenimiento->delete();
         array_map($this->borrarArchivo(...), $imagenes);
 
         return $this->exito('Mantenimiento eliminado junto con sus horarios y días programados', 'admin.mantenimientos.index');
